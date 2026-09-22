@@ -1,0 +1,360 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>PulseChat — Real-Time Group & Direct Messaging</title>
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=Plus+Jakarta+Sans:wght@400;500;600;700;800&family=JetBrains+Mono:wght@400;500&display=swap" rel="stylesheet">
+  <link rel="stylesheet" href="style.css">
+</head>
+<body>
+  <!-- Background Glow Accents -->
+  <div class="bg-glow bg-glow-1"></div>
+  <div class="bg-glow bg-glow-2"></div>
+
+  <!-- Toast Notification Container -->
+  <div id="toast-container" class="toast-container" aria-live="polite"></div>
+
+  <!-- 1. LOGIN / AUTH OVERLAY -->
+  <section id="login-screen" class="screen-modal active">
+    <div class="login-card glass-panel">
+      <div class="brand-header">
+        <div class="logo-badge">
+          <svg width="28" height="28" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round">
+            <path d="M21 15a2 2 0 0 1-2 2H7l-4 4V5a2 2 0 0 1 2-2h14a2 2 0 0 1 2 2z"></path>
+            <circle cx="9" cy="10" r="1"></circle>
+            <circle cx="12" cy="10" r="1"></circle>
+            <circle cx="15" cy="10" r="1"></circle>
+          </svg>
+        </div>
+        <h1>PulseChat</h1>
+        <p class="subtitle">Real-Time Group Chat & Messaging Engine</p>
+      </div>
+
+      <form id="login-form" class="login-form" autocomplete="off">
+        <div class="form-group">
+          <label for="username-input">Choose Your Nickname</label>
+          <div class="input-icon-wrapper">
+            <svg class="input-icon" width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+              <path d="M20 21v-2a4 4 0 0 0-4-4H8a4 4 0 0 0-4 4v2"></path>
+              <circle cx="12" cy="7" r="4"></circle>
+            </svg>
+            <input type="text" id="username-input" placeholder="e.g. Aarav, Priya, Rohan" maxlength="30" required autofocus>
+          </div>
+        </div>
+
+        <div class="form-group">
+          <label>Select Your Avatar</label>
+          <div class="avatar-selector" id="avatar-selector">
+            <button type="button" class="avatar-option selected" data-avatar="avatar1.png">
+              <span class="avatar-emoji">⚡</span>
+              <span class="avatar-name">Pulse</span>
+            </button>
+            <button type="button" class="avatar-option" data-avatar="avatar2.png">
+              <span class="avatar-emoji">🚀</span>
+              <span class="avatar-name">Cosmo</span>
+            </button>
+            <button type="button" class="avatar-option" data-avatar="avatar3.png">
+              <span class="avatar-emoji">💎</span>
+              <span class="avatar-name">Nova</span>
+            </button>
+            <button type="button" class="avatar-option" data-avatar="avatar4.png">
+              <span class="avatar-emoji">🔥</span>
+              <span class="avatar-name">Blaze</span>
+            </button>
+            <button type="button" class="avatar-option" data-avatar="avatar5.png">
+              <span class="avatar-emoji">🐱</span>
+              <span class="avatar-name">Cyber</span>
+            </button>
+          </div>
+        </div>
+
+        <div class="form-group">
+          <label for="initial-room-select">Initial Channel</label>
+          <select id="initial-room-select" class="custom-select">
+            <option value="general"># general (Default)</option>
+            <option value="developers"># developers (Dev & Code)</option>
+            <option value="random"># random (Casual)</option>
+          </select>
+        </div>
+
+        <button type="submit" id="btn-login-submit" class="btn-primary">
+          <span>Enter Chat Workspace</span>
+          <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round">
+            <line x1="5" y1="12" x2="19" y2="12"></line>
+            <polyline points="12 5 19 12 12 19"></polyline>
+          </svg>
+        </button>
+      </form>
+
+      <div class="login-footer">
+        <span>Assignment 13 • Powered by Socket.io</span>
+      </div>
+    </div>
+  </section>
+
+  <!-- 2. MAIN CHAT APPLICATION -->
+  <main id="chat-app" class="chat-app hidden">
+    <!-- TOP NAVIGATION BAR -->
+    <header class="top-nav glass-panel">
+      <div class="nav-left">
+        <button id="sidebar-toggle" class="btn-icon mobile-only" aria-label="Toggle Sidebar">
+          <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+            <line x1="3" y1="12" x2="21" y2="12"></line>
+            <line x1="3" y1="6" x2="21" y2="6"></line>
+            <line x1="3" y1="18" x2="21" y2="18"></line>
+          </svg>
+        </button>
+        <div class="app-brand">
+          <div class="logo-mini">
+            <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+              <path d="M21 15a2 2 0 0 1-2 2H7l-4 4V5a2 2 0 0 1 2-2h14a2 2 0 0 1 2 2z"></path>
+            </svg>
+          </div>
+          <span class="brand-title">PulseChat</span>
+          <span class="version-tag">Socket.io v4</span>
+        </div>
+      </div>
+
+      <div class="nav-center">
+        <div class="current-room-badge">
+          <span class="hash-tag">#</span>
+          <span id="nav-active-room-name">general</span>
+        </div>
+        <div class="connection-status" id="connection-status" title="Connected to WebSocket">
+          <span class="status-indicator online"></span>
+          <span class="status-label">Online</span>
+        </div>
+      </div>
+
+      <div class="nav-right">
+        <button id="btn-open-dm-list" class="btn-action dm-action-btn" title="Open Direct Messages">
+          <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+            <path d="M4 4h16c1.1 0 2 .9 2 2v12c0 1.1-.9 2-2 2H4c-1.1 0-2-.9-2-2V6c0-1.1.9-2 2-2z"></path>
+            <polyline points="22,6 12,13 2,6"></polyline>
+          </svg>
+          <span>Direct Messages</span>
+          <span id="unread-dm-badge" class="badge hidden">0</span>
+        </button>
+
+        <div class="current-user-pill">
+          <div class="user-avatar" id="nav-user-avatar">⚡</div>
+          <div class="user-details">
+            <span class="user-name" id="nav-username">Aarav</span>
+            <span class="user-role">Connected</span>
+          </div>
+        </div>
+      </div>
+    </header>
+
+    <!-- WORKSPACE BODY (SIDEBAR + CHAT CONTAINER + ROSTER) -->
+    <div class="workspace-grid">
+      <!-- LEFT SIDEBAR: CHANNELS -->
+      <aside class="sidebar glass-panel" id="sidebar">
+        <!-- CHANNELS SECTION -->
+        <div class="sidebar-section">
+          <div class="section-header">
+            <h3>Channels</h3>
+            <span class="badge-count" id="channel-count">3</span>
+          </div>
+
+          <div class="channel-list" id="channel-list">
+            <button class="channel-item active" data-room="general">
+              <span class="hash">#</span>
+              <span class="channel-name">general</span>
+              <span class="channel-tag">All-chat</span>
+            </button>
+            <button class="channel-item" data-room="developers">
+              <span class="hash">#</span>
+              <span class="channel-name">developers</span>
+              <span class="channel-tag">Dev</span>
+            </button>
+            <button class="channel-item" data-room="random">
+              <span class="hash">#</span>
+              <span class="channel-name">random</span>
+              <span class="channel-tag">Fun</span>
+            </button>
+          </div>
+
+          <!-- CREATE / JOIN CUSTOM CHANNEL -->
+          <form id="create-room-form" class="create-room-form" autocomplete="off">
+            <div class="create-input-wrapper">
+              <span class="input-prefix">#</span>
+              <input type="text" id="new-room-input" placeholder="Join or create channel..." maxlength="30" required>
+              <button type="submit" class="btn-add-room" title="Join Channel">
+                <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5">
+                  <line x1="12" y1="5" x2="12" y2="19"></line>
+                  <line x1="5" y1="12" x2="19" y2="12"></line>
+                </svg>
+              </button>
+            </div>
+          </form>
+        </div>
+
+        <!-- ACTIVE ROOM PARTICIPANTS ROSTER -->
+        <div class="sidebar-section roster-section">
+          <div class="section-header">
+            <div class="roster-title-group">
+              <h3>Active In Room</h3>
+              <span class="roster-room-name" id="roster-room-label">(#general)</span>
+            </div>
+            <span class="badge-count" id="roster-count">0</span>
+          </div>
+
+          <div class="roster-list" id="roster-list">
+            <!-- Dynamically populated from room:userlist -->
+            <div class="empty-roster-msg">Connecting to room...</div>
+          </div>
+        </div>
+
+        <!-- QUICK HELP FOOTER -->
+        <div class="sidebar-footer">
+          <div class="help-card">
+            <div class="help-title">💡 Quick Tip</div>
+            <p>Click any user in the roster to open a <strong>Private Direct Message</strong> channel.</p>
+          </div>
+        </div>
+      </aside>
+
+      <!-- CENTER: ACTIVE CHAT ROOM -->
+      <section class="chat-viewport glass-panel">
+        <!-- CHAT HEADER -->
+        <div class="chat-header">
+          <div class="chat-header-info">
+            <div class="room-title">
+              <span class="hash">#</span>
+              <h2 id="room-header-title">general</h2>
+            </div>
+            <p class="room-desc" id="room-header-desc">General discussion channel for all connected participants.</p>
+          </div>
+
+          <div class="chat-header-stats">
+            <div class="stat-pill">
+              <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                <path d="M17 21v-2a4 4 0 0 0-4-4H5a4 4 0 0 0-4 4v2"></path>
+                <circle cx="9" cy="7" r="4"></circle>
+                <path d="M23 21v-2a4 4 0 0 0-3-3.87"></path>
+                <path d="M16 3.13a4 4 0 0 1 0 7.75"></path>
+              </svg>
+              <span id="header-user-count">0 online</span>
+            </div>
+            <div class="stat-pill">
+              <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                <circle cx="12" cy="12" r="10"></circle>
+                <polyline points="12 6 12 12 16 14"></polyline>
+              </svg>
+              <span id="header-history-status">Last 50 replay</span>
+            </div>
+          </div>
+        </div>
+
+        <!-- MESSAGES CONTAINER -->
+        <div class="messages-container" id="messages-container">
+          <div class="history-banner">
+            <div class="history-line"></div>
+            <span class="history-text">Beginning of recent room history</span>
+            <div class="history-line"></div>
+          </div>
+          <!-- Chat messages rendered dynamically -->
+        </div>
+
+        <!-- TYPING INDICATOR BANNER -->
+        <div class="typing-container" id="typing-container">
+          <div class="typing-indicator-box hidden" id="typing-indicator-box">
+            <div class="typing-dots">
+              <span></span>
+              <span></span>
+              <span></span>
+            </div>
+            <span class="typing-text" id="typing-text">Someone is typing...</span>
+          </div>
+        </div>
+
+        <!-- CHAT INPUT BAR -->
+        <div class="chat-input-bar">
+          <form id="chat-form" class="chat-form" autocomplete="off">
+            <div class="input-actions-wrapper">
+              <input 
+                type="text" 
+                id="message-input" 
+                placeholder="Message #general... (Press Enter to send)" 
+                maxlength="2000"
+                required
+              >
+              <div class="quick-emojis">
+                <button type="button" class="btn-emoji" data-emoji="👋" title="Wave">👋</button>
+                <button type="button" class="btn-emoji" data-emoji="🔥" title="Fire">🔥</button>
+                <button type="button" class="btn-emoji" data-emoji="🚀" title="Rocket">🚀</button>
+                <button type="button" class="btn-emoji" data-emoji="💻" title="Code">💻</button>
+              </div>
+              <button type="submit" id="btn-send-message" class="btn-send" title="Send Message">
+                <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round">
+                  <line x1="22" y1="2" x2="11" y2="13"></line>
+                  <polygon points="22 2 15 22 11 13 2 9 22 2"></polygon>
+                </svg>
+              </button>
+            </div>
+          </form>
+        </div>
+      </section>
+    </div>
+  </main>
+
+  <!-- 3. DIRECT MESSAGES MODAL / DRAWER -->
+  <div id="dm-modal" class="modal-overlay hidden" aria-modal="true" role="dialog">
+    <div class="dm-card glass-panel">
+      <div class="dm-header">
+        <div class="dm-recipient-info">
+          <div class="dm-avatar" id="dm-recipient-avatar">⚡</div>
+          <div class="dm-details">
+            <div class="dm-title-row">
+              <h3 id="dm-recipient-name">Direct Message</h3>
+              <span class="dm-status-tag">Private DM</span>
+            </div>
+            <span class="dm-socket-id" id="dm-recipient-socket">Socket: ---</span>
+          </div>
+        </div>
+
+        <button id="btn-close-dm" class="btn-icon" title="Close DM">
+          <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+            <line x1="18" y1="6" x2="6" y2="18"></line>
+            <line x1="6" y1="6" x2="18" y2="18"></line>
+          </svg>
+        </button>
+      </div>
+
+      <div class="dm-messages-container" id="dm-messages-container">
+        <div class="dm-empty-state" id="dm-empty-state">
+          <div class="dm-empty-icon">🔒</div>
+          <h4>End-to-End Direct Message</h4>
+          <p>Direct messages are delivered strictly to this participant's socket ID and never broadcast to any room.</p>
+        </div>
+      </div>
+
+      <form id="dm-form" class="dm-input-form" autocomplete="off">
+        <input 
+          type="text" 
+          id="dm-message-input" 
+          placeholder="Send a private message..." 
+          maxlength="2000"
+          required
+        >
+        <button type="submit" class="btn-primary dm-send-btn">
+          <span>Send</span>
+          <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+            <line x1="22" y1="2" x2="11" y2="13"></line>
+            <polygon points="22 2 15 22 11 13 2 9 22 2"></polygon>
+          </svg>
+        </button>
+      </form>
+    </div>
+  </div>
+
+  <!-- Socket.io client library (served directly by Socket.io server) -->
+  <script src="/socket.io/socket.io.js"></script>
+  <!-- Main Frontend Application Logic -->
+  <script src="app.js"></script>
+</body>
+</html>
