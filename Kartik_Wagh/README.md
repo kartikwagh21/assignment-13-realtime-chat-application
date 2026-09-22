@@ -237,7 +237,5 @@ This project is built and optimized for seamless deployment on [Render](https://
 4. **Cold Starts:** On Render's Free tier, instances idle after 15 minutes of inactivity. The first visitor will wake the container (30–50s cold start).
 
 ---
-
-## 📹 Video Demonstration
-- **Video Submission URL:** _[Insert link to your 1-minute video demonstration here]_
-- **Demonstration Highlights:** Multi-tab room chatting, debounced typing indicators, instant history replay, and private direct messaging.
+DEPLOYMENT LINK :
+https://assignment-13-realtime-chat-application-32dx.onrender.com/
